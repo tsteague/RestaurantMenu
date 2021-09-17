@@ -8,11 +8,9 @@ class MenuItem
   private String name_ = null;
   private String description_ = null;
   private String category_ = null;
-  private List<String> ingredientAllergens_ = null;
   private double price_ = 0.00;
-
-  private Date menuLastModified_ = null;
-  private static List<String> CATEGORIES = initCategories();
+  private Date menuItemLastModified_ = null;
+  private List<String> ingredientAllergens_ = null;
 
   public MenuItem( String name, String description, double price )
   {
@@ -20,7 +18,7 @@ class MenuItem
     description_ = description;
     price_ = price;
 
-    menuLastModified_ = new Date();
+    menuItemLastModified_ = new Date();
   }
 
   public void setName( String name )
@@ -43,7 +41,7 @@ class MenuItem
 
   public void setCategory( String category ) throws Exception
   {
-    if ( !CATEGORIES.contains(category) )
+    if ( !Menu.CATEGORIES.contains(category) )
     {
       throw new Exception( "Not a menu category" );
     }
@@ -65,11 +63,18 @@ class MenuItem
 
   public void setDateAdded( Date addDate )
   {
-    menuLastModified_ = addDate;
+    menuItemLastModified_ = addDate;
   }
   public Date getDateAdded()
   {
-    return menuLastModified_;
+    return menuItemLastModified_;
+  }
+  public long getSaveDate()
+  {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime( getDateAdded() );
+    
+    return cal.getTimeInMillis();
   }
   public boolean isNew()
   {
@@ -80,19 +85,5 @@ class MenuItem
     menuDate.setTime( getDateAdded() );
 
     return menuDate.before( weekOld );
-  }
-    
-  private static List<String> initCategories()
-  {
-    List<String> categories = new ArrayList<String>();
-    categories.add( "appetizer" );
-    categories.add( "main course" );
-    categories.add( "dessert" );
-    categories.add( "drink" );
-    categories.add( "alcohol" );
-    categories.add( "kids" );
-    categories.add( "special" );
-
-    return categories;
   }
 }

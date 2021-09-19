@@ -12,6 +12,15 @@ class MenuItem
   private Date menuItemLastModified_ = null;
   private List<String> ingredientAllergens_ = null;
 
+  public MenuItem( String name, String description, double price, Date savedDate )
+  {
+    name_ = name;
+    description_ = description;
+    price_ = price;
+ 
+    menuItemLastModified_ = savedDate;
+  }
+
   public MenuItem( String name, String description, double price )
   {
     name_ = name;
@@ -78,12 +87,12 @@ class MenuItem
   }
   public boolean isNew()
   {
-    Calendar weekOld = Calendar.getInstance();
-    weekOld.add( Calendar.DAY_OF_MONTH, -7 );
+    Calendar threeDaysOld = Calendar.getInstance();
+    threeDaysOld.add( Calendar.DAY_OF_MONTH, -3 );
 
     Calendar menuDate = Calendar.getInstance();
     menuDate.setTime( getDateAdded() );
 
-    return menuDate.before( weekOld );
+    return menuDate.before( threeDaysOld );
   }
 }

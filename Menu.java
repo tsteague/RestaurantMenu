@@ -18,10 +18,12 @@ class Menu
   private Map<String,MenuItem> menuItems_ = new HashMap<String,MenuItem>(); 
   private Date menuLastModified_ = null;
 
-  private final static String MENU_FILE = "menu";
-  public final static List<String> CATEGORIES = initCategories();
+  private static final String restaurantName = "Telly's Bistro";
   private static Pattern itemPattern_ = Pattern.compile( "\\\"([^\\\"]+)\\\",?" );
   private static Matcher itemMatcher_ = null;
+  private final static String MENU_FILE = "menu";
+  public final static List<String> CATEGORIES = initCategories();
+  public final static long ONE_WEEK_OLD = 60 * 60 * 24 * 7;
 
   public Menu()
   {
@@ -34,18 +36,34 @@ class Menu
     {
       throw new Exception( newMenuItem.getName() + " already exists." );
     }
+    setLastUpdated(); // This is not correct but here until I think of a better soln
     menuItems_.put( newMenuItem.getName().toLowerCase(), newMenuItem );
 
     storeMenu();
   }
-  public void removeItem( MenuItem newMenuItem ) throws Exception
+  public void removeItem( String itemName ) throws Exception
   {
-    if ( hasMenuItem(newMenuItem.getName()) )
+    if ( hasMenuItem(itemName) )
     {
-      menuItems_.remove( newMenuItem.getName().toLowerCase() );
+      menuItems_.remove( itemName.toLowerCase() );
 
       storeMenu();
     }
+  }
+
+  private void setLastUpdated()
+  {
+    menuLastModified_ = new Date();
+  }
+  private String getLastUpdated()
+  {
+    String lastUpdated = "";
+    if ( menuLastModified_ != null )
+    {
+      lastUpdated = menuLastModified_.toString();
+    }
+
+    return lastUpdated;
   }
 
   public MenuItem getItem( String name )
@@ -74,6 +92,10 @@ class Menu
 
   public void printMenu()
   {
+    System.out.println( restaurantName );
+    System.out.println( "Last updated: " + getLastUpdated() );
+    System.out.println( "--------------------" );
+    System.out.println( "--------------------" );
     for( String category : CATEGORIES )
     {
       System.out.println( "----- " + category + " -----" );
@@ -81,13 +103,46 @@ class Menu
       {
         if ( item.getCategory().equalsIgnoreCase(category) )
         {
-          System.out.println( item.getName() );
+          System.out.print( item.getName() );
+	  System.out.println( item.isNew() ? " (New)" :  "" );
           System.out.println( item.getDescription() );
           System.out.println( "$" + item.getPrice() );
           System.out.println();
         }
       }
     }
+  }
+
+  public void printMenu( String chosenSearch )
+  {
+    boolean foundItem = false;
+    for ( MenuItem item : menuItems_.values() )
+    {
+      if ( item.getCategory().equalsIgnoreCase(chosenSearch) || item.getName().equalsIgnoreCase(chosenSearch) )
+      {
+        System.out.println( item.getName() );
+        System.out.println( item.getDescription() );
+        System.out.println( "$" + item.getPrice() );
+        System.out.println();
+
+        foundItem = true;
+      }
+    }
+
+    if ( !foundItem )
+    {
+      System.out.println( chosenSearch + " not found." );
+    }
+    System.out.println( "" );
+  }
+
+  public void printCategories()
+  {
+    for ( String category : CATEGORIES )
+    {
+      System.out.println( category );
+    }
+    System.out.println( "" );
   }
 
   private boolean populateMenu()
@@ -139,7 +194,7 @@ class Menu
             }
             count++;
           }
-          menuItem = new MenuItem( name, description, price );
+          menuItem = new MenuItem( name, description, price, dt );
           menuItem.setCategory( category );
 
           addItem( menuItem );
@@ -180,6 +235,8 @@ class Menu
         bw.write( ",\"" + item.getSaveDate() + "\"" );
         bw.newLine();
       }
+      setLastUpdated();
+
       success = true;
     }
     catch ( Exception e )

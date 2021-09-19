@@ -47,5 +47,28 @@ class Restaurant
       Menu menu = new Menu();
       menu.printMenu();
     }
+    else if ( args.length == 2 && args[0].trim().equalsIgnoreCase("--print") && 
+              args[1].trim().equalsIgnoreCase("categories") )
+    {
+      Menu menu = new Menu();
+      menu.printCategories();
+    }
+    else if ( args.length == 2 && args[0].trim().equalsIgnoreCase("--print") )
+    {
+      Menu menu = new Menu();
+      menu.printMenu( args[1].trim() );
+    }
+    else if ( args.length == 2 && args[0].trim().equalsIgnoreCase("--removeItem") )
+    {
+      Menu menu = new Menu();
+      try
+      {
+        menu.removeItem( args[1].trim() );
+      }
+      catch ( Exception e )
+      {
+        System.out.println( "Error removing " + args[1] + ": " + e.getMessage() );
+      }
+    }
   }
 }
